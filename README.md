@@ -1,0 +1,4 @@
+- Download SDK from [here](https://developer.leapmotion.com)
+- `npm install --g babel-cli`
+- `npm install --g gulp`
+- `npm install`
