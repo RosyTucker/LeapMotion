@@ -7,40 +7,18 @@ let scene, camera, renderer, mesh, geometry;
 
 
 const getShapeGeometry = () => {
-    const shape = new THREE.Shape();
-
-    shape.moveTo(0, 0);
-    shape.bezierCurveTo(0, 0, 0, 10, 10, 10);
-    //shape.bezierCurveTo( 30, 0, 30, 35,30,35 );
-    //shape.bezierCurveTo( 30, 55, 10, 77, 25, 95 );
-    //shape.bezierCurveTo( 60, 77, 80, 55, 80, 35 );
-    //shape.bezierCurveTo( 80, 35, 80, 0, 50, 0 );
-    //shape.bezierCurveTo( 35, 0, 25, 25, 25, 25 );
-
-    const extrudeSettings = {
-        amount: 8,
-        bevelEnabled: true,
-        bevelSegments: 2,
-        steps: 2,
-        bevelSize: 1,
-        bevelThickness: 1
-    };
-
-    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    return new THREE.SphereGeometry(5, 8, 8);
 };
 
-const moveShape = () => {
-    geometry.vertices.forEach((vert) => {
-        vert.x -= 100;
-        vert.y -= 100;
-    });
-    mesh.geometry.__dirtyVertices = true;
+const moveShape = (position) => {
+    console.log(position);
+    mesh.position.set(position[0], position[1], position[2]);
 };
 
 const initScene = () => {
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.set(0, 0, 500);
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
+    camera.position.set(118, 118, 70);
     scene.add(camera);
 
     const light = new THREE.PointLight(0xffffff, 0.8);
@@ -56,11 +34,8 @@ const initScene = () => {
     document.getElementById('leap-canvas').appendChild(renderer.domElement);
 };
 
-const animate = () => {
-    requestAnimationFrame(animate);
-    mesh.rotation.x += 0.01;
-    mesh.rotation.y += 0.02;
-    moveShape();
+const animate = (position) => {
+    moveShape(position);
     renderer.render(scene, camera);
 };
 
@@ -76,9 +51,11 @@ window.onload = () => {
 
         work(my) {
             initScene();
+            my.leapmotion.on('frame', (frame) => {
+                //console.log(frame.interactionBox);
+            });
             my.leapmotion.on('hand', (hand) => {
-                console.log(hand);
-                animate();
+                animate(hand.palmPosition);
             });
 
         }
