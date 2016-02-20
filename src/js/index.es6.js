@@ -15,13 +15,21 @@ const setPosition = (mesh, positionVector) => {
     mesh.position.set(positionVector[0], positionVector[1], positionVector[2]);
 };
 
+const moveFinger = (finger, fingerModel) => {
+    setPosition(finger.carp, fingerModel.carpPosition);
+    setPosition(finger.dip, fingerModel.dipPosition);
+    setPosition(finger.mcp, fingerModel.mcpPosition);
+    setPosition(finger.pip, fingerModel.pipPosition);
+    setPosition(finger.tip, fingerModel.tipPosition);
+};
+
 const moveHand = (hand, handModel) => {
     setPosition(hand.palm, handModel.palmPosition);
-    setPosition(hand.thumb, handModel.thumb.tipPosition);
-    setPosition(hand.indexFinger, handModel.indexFinger.tipPosition);
-    setPosition(hand.middleFinger, handModel.middleFinger.tipPosition);
-    setPosition(hand.ringFinger, handModel.ringFinger.tipPosition);
-    setPosition(hand.pinky, handModel.pinky.tipPosition);
+    moveFinger(hand.thumb, handModel.thumb);
+    moveFinger(hand.indexFinger, handModel.indexFinger);
+    moveFinger(hand.middleFinger, handModel.middleFinger);
+    moveFinger(hand.ringFinger, handModel.ringFinger);
+    moveFinger(hand.pinky, handModel.pinky);
 };
 
 const sphere = (color = '#f00000', radius = 5) => {
@@ -30,24 +38,42 @@ const sphere = (color = '#f00000', radius = 5) => {
     return new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: color}));
 };
 
+const getFinger = (color) => {
+    return {
+        carp: sphere(color),
+        dip: sphere(color),
+        mcp: sphere(color),
+        pip: sphere(color),
+        tip: sphere(color)
+    }
+};
+
 const getHand = () => {
-    return  {
+    return {
         palm: sphere('#00f000', 10),
-        thumb: sphere('#f00000'),
-        indexFinger: sphere('#0000f0'),
-        middleFinger: sphere('#f0f000'),
-        ringFinger: sphere('#f000f0'),
-        pinky: sphere('#00f0f0')
+        thumb: getFinger('#f00000'),
+        indexFinger: getFinger('#0000f0'),
+        middleFinger: getFinger('#f0f000'),
+        ringFinger: getFinger('#f000f0'),
+        pinky: getFinger('#00f0f0')
     };
+};
+
+const addFingerToScene = (scene, finger) => {
+    scene.add(finger.carp);
+    scene.add(finger.dip);
+    scene.add(finger.mcp);
+    scene.add(finger.pip);
+    scene.add(finger.tip);
 };
 
 const addHandToScene = (scene, hand) => {
     scene.add(hand.palm);
-    scene.add(hand.thumb);
-    scene.add(hand.indexFinger);
-    scene.add(hand.middleFinger);
-    scene.add(hand.ringFinger);
-    scene.add(hand.pinky);
+    addFingerToScene(scene, hand.thumb);
+    addFingerToScene(scene, hand.indexFinger);
+    addFingerToScene(scene, hand.middleFinger);
+    addFingerToScene(scene, hand.ringFinger);
+    addFingerToScene(scene, hand.pinky);
 };
 
 const initScene = () => {
