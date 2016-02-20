@@ -3,34 +3,37 @@ import Logger from './Logger.es6.js';
 import d3 from 'd3';
 import THREE from 'three';
 
-let scene, camera, renderer, mesh, geometry;
-
-
-const getShapeGeometry = () => {
-    return new THREE.SphereGeometry(5, 8, 8);
+const SCALE = 0.9, CAMERA_CONFIG = {
+    fieldOfView: 50,
+    near: 0.1,
+    far: 10000
 };
 
+let scene, camera, renderer, mesh, geometry;
+
 const moveShape = (position) => {
-    console.log(position);
     mesh.position.set(position[0], position[1], position[2]);
 };
 
 const initScene = () => {
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
-    camera.position.set(118, 118, 70);
+    const aspectRatio = (window.innerWidth / window.innerHeight) * SCALE;
+    camera = new THREE.PerspectiveCamera(CAMERA_CONFIG.fieldOfView, aspectRatio, CAMERA_CONFIG.near, CAMERA_CONFIG.far);
+    camera.position.z = 200;
+    camera.position.y = 200;
     scene.add(camera);
 
     const light = new THREE.PointLight(0xffffff, 0.8);
     camera.add(light);
 
-    geometry = getShapeGeometry();
+    geometry = new THREE.SphereGeometry(5, 8, 8);
     geometry.dynamic = true;
     mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: '#f00000'}));
+    mesh.position.set(0, 0, 0);
     scene.add(mesh);
 
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(window.innerWidth * SCALE, window.innerHeight * SCALE);
     document.getElementById('leap-canvas').appendChild(renderer.domElement);
 };
 
@@ -41,23 +44,14 @@ const animate = (position) => {
 
 window.onload = () => {
     Cylon.robot({
-        connections: {
-            leapmotion: {adaptor: 'leapmotion'}
-        },
-
-        devices: {
-            leapmotion: {driver: 'leapmotion'}
-        },
+        connections: {leapmotion: {adaptor: 'leapmotion'}},
+        devices: {leapmotion: {driver: 'leapmotion'}},
 
         work(my) {
             initScene();
-            my.leapmotion.on('frame', (frame) => {
-                //console.log(frame.interactionBox);
-            });
             my.leapmotion.on('hand', (hand) => {
                 animate(hand.palmPosition);
             });
-
         }
 
     }).start();
